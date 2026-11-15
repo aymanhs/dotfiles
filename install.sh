@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # dotfiles installer: zsh, oh-my-zsh, powerlevel10k, ripgrep, fzf, zoxide,
-# eza, bat, fd, dust, bottom, delta, duf.
+# eza, bat, fd, dust, bottom, delta, duf, tealdeer, direnv.
 # Works on Ubuntu/Debian (apt) and Rocky/RHEL/Fedora (dnf). Safe to re-run.
 
 set -euo pipefail
@@ -41,11 +41,16 @@ install_dust
 install_bottom
 install_delta
 install_duf
+install_tealdeer
+install_direnv
 
 link_file "$SCRIPT_DIR/zsh/zshrc" "$HOME/.zshrc"
 link_file "$SCRIPT_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
 link_file "$SCRIPT_DIR/zsh/aliases.zsh" "$HOME/.aliases.zsh"
 link_delta_gitconfig
+
+mkdir -p "$HOME/.config/tealdeer"
+link_file "$SCRIPT_DIR/tealdeer/config.toml" "$HOME/.config/tealdeer/config.toml"
 
 echo
 echo "Done."

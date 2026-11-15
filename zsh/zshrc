@@ -15,6 +15,8 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+zstyle ':completion:*' menu select
+
 [[ -f ~/.aliases.zsh ]] && source ~/.aliases.zsh
 [[ -f ~/.local.sh ]] && source ~/.local.sh
 
@@ -28,3 +30,19 @@ fi
 
 eval "$(fzf --zsh)"
 eval "$(zoxide init zsh --cmd cd)"
+eval "$(direnv hook zsh)"
+
+# Optional plugins: enabled only if found (oh-my-zsh custom dir or system package).
+# zsh-syntax-highlighting must be sourced last.
+_source_if_found() {
+  local name="$1" script="$2" path
+  for path in \
+    "${ZSH_CUSTOM:-$ZSH/custom}/plugins/$name/$script" \
+    "/usr/share/$name/$script" \
+    "/usr/local/share/$name/$script"; do
+    [[ -r "$path" ]] && source "$path" && return
+  done
+}
+_source_if_found zsh-autosuggestions zsh-autosuggestions.zsh
+_source_if_found zsh-syntax-highlighting zsh-syntax-highlighting.zsh
+unset -f _source_if_found

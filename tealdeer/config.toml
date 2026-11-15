@@ -1,0 +1,5 @@
+[updates]
+# Default rustls-with-webpki-roots fails behind the corp TLS proxy
+# (unknown issuer on tldr-pages.C..zip). Native roots pick up the
+# corp CA from the system trust store instead.
+tls_backend = "rustls-with-native-roots"

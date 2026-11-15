@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Install ripgrep, fzf, zoxide, eza, bat, fd, dust, bottom, delta and duf as
-# static binaries into BIN_DIR.
+# Install ripgrep, fzf, zoxide, eza, bat, fd, dust, bottom, delta, duf,
+# tealdeer (tldr) and direnv as static binaries into BIN_DIR.
 # Idempotent: skips download if the pinned version is already installed.
 
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
@@ -241,4 +241,52 @@ install_duf() {
   tar -xzf "$tmp/duf.tar.gz" -C "$tmp"
   install -Dm755 "$tmp/duf" "$BIN_DIR/duf"
   echo "Installed duf $DUF_VERSION to $BIN_DIR/duf"
+}
+
+install_tealdeer() {
+  _already_installed tldr "$TEALDEER_VERSION" && { echo "tealdeer $TEALDEER_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-musl" ;;
+    aarch64) target="aarch64-musl" ;;
+    *) echo "Unsupported arch for tealdeer: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local base="tealdeer-linux-${target}"
+  local url="https://github.com/tealdeer-rs/tealdeer/releases/download/v${TEALDEER_VERSION}/${base}"
+
+  curl -fsSL "$url" -o "$tmp/tldr"
+  curl -fsSL "${url}.sha256" -o "$tmp/tldr.sha256"
+  (cd "$tmp" && sed "s/${base}/tldr/" "tldr.sha256" | sha256sum -c -)
+
+  install -Dm755 "$tmp/tldr" "$BIN_DIR/tldr"
+  "$BIN_DIR/tldr" --update >/dev/null 2>&1 || true
+  echo "Installed tealdeer $TEALDEER_VERSION to $BIN_DIR/tldr"
+}
+
+install_direnv() {
+  _already_installed direnv "$DIRENV_VERSION" && { echo "direnv $DIRENV_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="linux-amd64" ;;
+    aarch64) target="linux-arm64" ;;
+    *) echo "Unsupported arch for direnv: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  # Upstream publishes no checksum file for release binaries.
+  local url="https://github.com/direnv/direnv/releases/download/v${DIRENV_VERSION}/direnv.${target}"
+
+  curl -fsSL "$url" -o "$tmp/direnv"
+  install -Dm755 "$tmp/direnv" "$BIN_DIR/direnv"
+  echo "Installed direnv $DIRENV_VERSION to $BIN_DIR/direnv"
 }
