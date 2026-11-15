@@ -26,6 +26,7 @@ pkg_install zsh git curl tar
 
 install_oh_my_zsh
 install_p10k_theme
+check_gitstatus_connectivity
 
 install_ripgrep
 install_fzf

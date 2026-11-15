@@ -22,3 +22,25 @@ install_p10k_theme() {
     echo "Installed powerlevel10k theme"
   fi
 }
+
+# p10k's git status segment downloads a prebuilt `gitstatusd` binary from
+# GitHub on first use. On boxes without outbound internet access this hangs
+# the shell on login. Warn up front and point at the escape hatch.
+check_gitstatus_connectivity() {
+  if curl -fsSL -m 5 -o /dev/null https://github.com 2>/dev/null; then
+    echo "GitHub reachable - powerlevel10k git status (gitstatusd) will work normally."
+    return
+  fi
+
+  cat >&2 <<'EOF'
+
+WARNING: cannot reach github.com - powerlevel10k's gitstatusd download will
+hang on first login (git status segment in the prompt).
+
+To disable it on this machine, add to ~/.local.sh:
+
+  export POWERLEVEL9K_DISABLE_GITSTATUS=true
+
+(~/.local.sh is sourced from .zshrc and is machine-local, not in this repo.)
+EOF
+}
