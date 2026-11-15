@@ -1,21 +1,25 @@
 # dotfiles
 
 zsh + oh-my-zsh + powerlevel10k + ripgrep/fzf/zoxide/eza/bat/fd/dust/bottom/
-delta/duf, installed the same way on Ubuntu/Debian and Rocky/RHEL/Fedora.
-Idempotent — re-running `install.sh` is how you update.
+delta/duf/jq/yq/sd/procs, installed the same way on Ubuntu/Debian and
+Rocky/RHEL/Fedora. Idempotent — re-running `install.sh` is how you update.
 
 ## Tools and their aliases
 
 | New tool | Replaces | Alias               | Notes |
 |----------|----------|---------------------|-------|
 | eza      | ls       | `ls`, `ll`, `la`, `lt` | |
-| rg       | grep     | `grep`               | |
+| rg       | grep     | none               | |
 | bat      | cat      | `cat`                | `--paging=never`, so it behaves like `cat` in pipes/scripts |
 | dust     | du       | `du`                 | |
 | bottom   | top/htop | `top`                | |
 | duf      | df       | *(none — run `duf` directly)* | |
 | delta    | —        | *(none — git pager)* | wired into `~/.gitconfig` via `include.path`, see below |
 | fd       | find     | *(none, deliberately)* | flag syntax is **not** compatible with `find` — aliasing it is a trap for old muscle memory, run `fd` directly |
+| jq       | —        | none                 | JSON processor |
+| yq       | —        | none                 | YAML/XML/TOML processor, same syntax as jq |
+| sd       | sed      | none                 | saner find/replace syntax, run `sd` directly |
+| procs    | ps       | none                 | |
 
 ## Install (new machine)
 
@@ -28,7 +32,7 @@ cd ~/dotfiles
 chsh -s "$(command -v zsh)"   # if not already your shell
 ```
 
-Needs `sudo` for `zsh`/`git`/`curl`/`tar` via apt/dnf. Everything else
+Needs `sudo` for `zsh`/`git`/`curl`/`tar`/`unzip` via apt/dnf. Everything else
 (oh-my-zsh, p10k theme, all the static-binary tools) installs into your user
 account — binaries go to `~/.local/bin`, no root needed.
 
@@ -43,9 +47,9 @@ current), re-links config. Safe to run anytime.
 
 ## Syncing config changes
 
-`~/.zshrc`, `~/.p10k.zsh` and `~/.aliases.zsh` are symlinks into this repo
-(`zsh/zshrc`, `zsh/p10k.zsh`, `zsh/aliases.zsh`), so editing any of them in
-place edits the repo copy directly.
+`~/.zshrc`, `~/.p10k.zsh`, `~/.aliases.zsh` and `~/.vimrc` are symlinks into
+this repo (`zsh/zshrc`, `zsh/p10k.zsh`, `zsh/aliases.zsh`, `vim/vimrc`), so
+editing any of them in place edits the repo copy directly.
 
 **Push a change you made locally:**
 
@@ -64,10 +68,10 @@ content.
 
 ## Bumping tool versions
 
-Edit `lib/versions.sh`, then run `./install.sh`. ripgrep and fzf downloads are
-checksum-verified against the upstream release; the rest (zoxide, eza, bat,
-fd, dust, bottom, delta, duf) are fetched straight from GitHub over TLS (no
-published checksums for those releases).
+Edit `lib/versions.sh`, then run `./install.sh`. ripgrep, fzf, jq and yq
+downloads are checksum-verified against the upstream release; the rest
+(zoxide, eza, bat, fd, dust, bottom, delta, duf, sd, procs) are fetched
+straight from GitHub over TLS (no published checksums for those releases).
 
 ## Layout
 
@@ -86,6 +90,8 @@ zsh/
   aliases.zsh         -> ~/.aliases.zsh
 git/
   delta.gitconfig      included from ~/.gitconfig, not symlinked directly
+vim/
+  vimrc               -> ~/.vimrc
 ```
 
 ## Notes

@@ -1,0 +1,345 @@
+try
+    colorscheme molokai
+catch /^Vim\%((\a\+)\)\=:E185/
+    colorscheme slate
+    " deal with it
+endtry
+
+set nocompatible
+
+" We use the buffer explorer, so disable the menu
+let no_buffers_menu = 1
+
+source $VIMRUNTIME/vimrc_example.vim
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
+" execute pathogen#infect()
+
+set diffexpr=MyDiff()
+function! MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let eq = ''
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      let cmd = '""' . $VIMRUNTIME . '\diff"'
+      let eq = '"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+endfunction
+
+" Ayman Settings
+" Search tags first, then cscope
+set csto=1
+
+" If file is readonly, then prevent us from modifying it
+function UpdateModifiable()
+  if !exists("b:setmodifiable")
+    let b:setmodifiable = 0
+  endif
+  if &readonly
+    if &modifiable
+      setlocal nomodifiable
+      let b:setmodifiable = 1
+    endif
+  else
+    if b:setmodifiable
+      setlocal modifiable
+    endif
+  endif
+endfunction
+autocmd BufReadPost * call UpdateModifiable()
+
+" Store up tp 30 in our Most Recently Used files
+let MRU_Max_Entries = 30
+let MRU_Exclude_Files = '_vimrc'
+
+if has("gui-running")
+    " Change Line Numbering colors to more subtle shade
+    highlight LineNr guifg=#8080B0 guibg=#101040
+    # " Change Bright yellow highlight for search to more subtle shade
+    highlight Search guibg=#404070 guifg=#ffffc0 gui=italic
+    " Show the cursor line
+    highlight CursorLine guibg=#101040
+    " .. and show the cursor line
+    set cursorline
+endif 
+
+" set columns=200
+" set lines=70
+set nowrap
+set number
+set ignorecase
+set tabstop=4
+set shiftwidth=4
+set expandtab
+set smarttab
+set wildignore=*.pyd,*.pyo,*~
+
+set list
+set listchars=tab:>.,trail:.
+
+" Always cd to current file directory
+autocmd BufEnter * lcd %:p:h
+
+" Visual Mode using arrows
+vmap <DOWN> j
+vmap <UP> k
+vmap <LEFT> h
+vmap <RIGHT> l
+vmap <END> $
+vmap <PageUp> 35k
+vmap <PageDown> 35j
+vmap <C-End> G
+vmap <C-Home> 0G
+
+" Easy Indenting with Tab
+vmap <Tab> >><ESC>
+vmap <S-Tab> <<<ESC>
+
+" If there is no selection, then do it on the line
+nmap <Tab> V>><Esc>
+nmap <S-Tab> V<<<Esc>
+
+" F3 is find next, live with it
+nmap <F3> n
+nmap <S-F3> N
+
+nnoremap <silent> <C-L> :noh<CR><C-L>
+
+noremap <C-TAB> :bn<CR>
+noremap <C-S-TAB> :bp<CR>
+noremap <C-T> :confirm enew<CR>
+" \bs is mapped already to BufExplorer
+map     <A-=> \bs
+noremap <A-1> :b 1<CR>
+noremap <A-2> :b 2<CR>
+noremap <A-3> :b 3<CR>
+noremap <A-4> :b 4<CR>
+noremap <A-5> :b 5<CR>
+noremap <A-6> :b 6<CR>
+noremap <A-7> :b 7<CR>
+noremap <A-8> :b 8<CR>
+noremap <A-9> :b 9<CR>
+noremap <A-0> :b 10<CR>
+
+nmap <C-F4> :bd!<CR>
+
+set switchbuf=useopen
+set laststatus=2 
+set statusline=%02n:%<%f%y\ %L\ Lines\ %h%m%r%=%-14.(%l,%c%V%)\ Char:\ %03b\ (%Bh)
+
+" This will execute the command given and put its output in a new tab
+function! TabMessage(cmd)
+ redir => message
+ silent execute a:cmd
+ redir END
+ tabnew
+ silent put=message
+ set nomodified
+endfunction
+command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
+
+set wildmenu
+set lazyredraw
+set linespace=0  " don't insert any extra pixel lines betweens rows
+set tags+=../tags,../../tags,../../../tags
+set hidden
+set scrolloff=3 " Keep 3 lines when scrolling
+
+" QuickFix window
+nmap <C-F3> :copen<CR>
+
+" Jump in tags using A-Left and A-Right
+nnoremap <A-Left> <C-T>
+nnoremap <A-Right> <C-]>
+" List all tags matching tag.  Useful if multiple files have the same tag
+nnoremap <A-Down> :tjump<CR>
+set guioptions+=b
+
+" Quick grep word under cursor
+nmap <silent> \f :vimgrep /<C-R><C-W>/j *<CR>:copen<CR> 
+
+" Auto-complete word under cursor from any buffer.  Poor man's Auto-Complete 
+" This is now better handled with the smart tab plugin
+" imap <C-Space> <C-P>
+
+" Use C-Up and C-Down to insert the char above and below cursor
+inoremap <C-UP> <C-Y>
+inoremap <C-Down> <C-E>
+
+" Making sessions:
+set sessionoptions=buffers,help,resize,globals,curdir
+
+command! SessionLoad browse source ~\.vim\sessions\
+
+function! SessionSave() 
+    if empty("v:this_session")
+        browse mksession ~\.vim\sessions
+    else
+        exe "mksession! " . v:this_session
+    endif
+endfunction
+
+command! SessionSave call SessionSave()
+"""""""""""""""""""""""""""""""""
+" line wrapping and movements
+"""""""""""""""""""""""""""""""""
+" toggle wrapping with \w
+noremap <silent> <Leader>w :call ToggleWrap()<CR>
+function! ToggleWrap()
+  if &wrap
+    echo "Wrap OFF"
+    call UnwrapIt()
+  else
+    echo "Wrap ON"
+    call WrapIt()
+  endif
+endfunction
+ 
+function! WrapIt()
+  set wrap linebreak
+  set virtualedit=
+  set breakat=\ ^I!@*-+;:,./? " when wrapping, break at these characters (requires linbreak, see above)
+  set showbreak="> "
+  setlocal display+=lastline
+  noremap <buffer> <silent> k gk
+  noremap <buffer> <silent> j gj
+  noremap <buffer> <silent> <Up> gk
+  noremap <buffer> <silent> <Down> gj
+  noremap <buffer> <silent> <Home> g<Home>
+  noremap <buffer> <silent> <End> g<End>
+  inoremap <buffer> <silent> <Up> <C-o>gk
+  inoremap <buffer> <silent> <Down> <C-o>gj
+  inoremap <buffer> <silent> <Home> <C-o>g<Home>
+  inoremap <buffer> <silent> <End> <C-o>g<End>
+endfunction
+ 
+function! UnwrapIt()
+  set nowrap
+  set virtualedit=all
+  silent! nunmap <buffer> j
+  silent! nunmap <buffer> k
+  silent! nunmap <buffer> <Up>
+  silent! nunmap <buffer> <Down>
+  silent! nunmap <buffer> <Home>
+  silent! nunmap <buffer> <End>
+  silent! iunmap <buffer> <Up>
+  silent! iunmap <buffer> <Down>
+  silent! iunmap <buffer> <Home>
+  silent! iunmap <buffer> <End>
+endfunction
+ 
+if &wrap
+  call WrapIt()
+endif
+
+" Builtin Explorer
+let g:netrw_liststyle=1  " Show wide listing
+
+nnoremap <silent> <F8> :TlistToggle<CR>
+
+let Tlist_Enable_Fold_Column = 0
+
+set guioptions-=T "Do not show the toolbar
+
+" Location of all undo files ("*.un~")
+set udir=$TEMP/vimundo
+
+" json, do not use concealing (confusing)
+let g:vim_json_syntax_conceal = 0
+
+" This will execute the command given and put its output in a new tab
+function! AddQuiFixLine()
+    let section = substitute(getline("."), '\(.*section \+\)\([a-zA-Z0-9^]\+\)', "\\2", "")
+    caddexpr expand("%") . ":" . line(".") .  ":" . section
+endfunction
+command! AddQuiFixLine :call AddQuiFixLine()
+map <F9> g/?Section/AddQuiFixLine<CR>:copen<CR>
+
+" Move swp files to temporary folder
+" This created name collisions when editing same filename in
+" different folders.  back to the old swp in same folder
+" if has("win32") || has("win64")
+"    set directory=$TMP backupdir=$TMP
+" else
+"    set directory=/tmp backupdir=$TMP
+" end 
+
+" Use Visual mode by default
+set selectmode=
+
+" Python files omnicompletion
+autocmd FileType python set omnifunc=pythoncomplete#Complete
+
+" This is used to zoom in or out by changing the font size
+function! Zoom(delta)
+    let f = &guifont
+    let s = strpart(f, stridx(f, ":h")+2, 2)
+    if a:delta == 0
+        let s = 12
+    else
+        let s += a:delta
+    endif
+    let newfont = "Consolas:h" . s . ":cANSI"
+    let &guifont=newfont
+endfunction
+
+noremap <C-kPlus> :call Zoom(1)<CR>
+noremap <C-kMinus> :call Zoom(-1)<CR>
+noremap <C-k0> :call Zoom(0)<CR>
+
+if has('win32') || has('win64')
+    call Zoom(0)
+endif
+
+
+" Remember more history
+set history=100
+" Add  Filter command to output g command to scratch window and buffer
+command! -nargs=? Filter let @a='' | execute 'g/<args>/y A' | new | setlocal bt=nofile | put! a
+
+fun! ShowFuncName()
+  let lnum = line(".")
+  let col = col(".")
+  echohl ModeMsg
+  echo getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW'))
+  echohl None
+  call search("\\%" . lnum . "l" . "\\%" . col . "c")
+endfun
+map f :call ShowFuncName() <CR>
+
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" MULTIPURPOSE TAB KEY
+" Indent if we're at the beginning of a line. Else, do completion.
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! InsertTabWrapper()
+    let col = col('.') - 1
+    if !col || getline('.')[col - 1] !~ '\k'
+        return "\<tab>"
+    else
+        return "\<c-p>"
+    endif
+endfunction
+inoremap <expr> <tab> InsertTabWrapper()
+inoremap <s-tab> <c-n>
+
+nnoremap <MiddleMouse> :set paste<cr>i
+
+nnoremap <c-n> :set number!<cr>
+
+nnoremap <c-p> :set list!<cr>

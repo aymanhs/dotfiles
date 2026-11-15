@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Install ripgrep, fzf, zoxide, eza, bat, fd, dust, bottom, delta, duf,
-# tealdeer (tldr), direnv and atuin as static binaries into BIN_DIR.
+# tealdeer (tldr), direnv, atuin, jq, yq, sd and procs as static binaries
+# into BIN_DIR.
 # Idempotent: skips download if the pinned version is already installed.
 
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
@@ -315,4 +316,107 @@ install_atuin() {
   tar -xzf "$tmp/atuin.tar.gz" -C "$tmp"
   install -Dm755 "$tmp/${base}/atuin" "$BIN_DIR/atuin"
   echo "Installed atuin $ATUIN_VERSION to $BIN_DIR/atuin"
+}
+
+install_jq() {
+  _already_installed jq "$JQ_VERSION" && { echo "jq $JQ_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="amd64" ;;
+    aarch64) target="arm64" ;;
+    *) echo "Unsupported arch for jq: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local asset="jq-linux-${target}"
+  local base_url="https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}"
+
+  curl -fsSL "${base_url}/${asset}" -o "$tmp/jq"
+  curl -fsSL "${base_url}/sha256sum.txt" -o "$tmp/checksums.txt"
+  (cd "$tmp" && grep " ${asset}\$" checksums.txt | awk '{print $1"  jq"}' | sha256sum -c -)
+
+  install -Dm755 "$tmp/jq" "$BIN_DIR/jq"
+  echo "Installed jq $JQ_VERSION to $BIN_DIR/jq"
+}
+
+install_yq() {
+  _already_installed yq "$YQ_VERSION" && { echo "yq $YQ_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="amd64" ;;
+    aarch64) target="arm64" ;;
+    *) echo "Unsupported arch for yq: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local asset="yq_linux_${target}"
+  local base_url="https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}"
+
+  curl -fsSL "${base_url}/${asset}" -o "$tmp/yq"
+  # Upstream's "checksums" file holds 30 hash algorithms per line (see
+  # checksums_hashes_order); field 19 is SHA-256.
+  curl -fsSL "${base_url}/checksums" -o "$tmp/checksums.txt"
+  (cd "$tmp" && awk -v f="$asset" '$1==f{print $19"  yq"}' checksums.txt | sha256sum -c -)
+
+  install -Dm755 "$tmp/yq" "$BIN_DIR/yq"
+  echo "Installed yq $YQ_VERSION to $BIN_DIR/yq"
+}
+
+install_sd() {
+  # The v1.1.0 release binary misreports itself as "sd 1.0.0" (upstream
+  # didn't bump the embedded version string), so check against that instead
+  # of SD_VERSION.
+  _already_installed sd "1.0.0" && { echo "sd $SD_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-unknown-linux-musl" ;;
+    aarch64) target="aarch64-unknown-linux-musl" ;;
+    *) echo "Unsupported arch for sd: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local base="sd-v${SD_VERSION}-${target}"
+  # Upstream publishes no checksum file for release binaries.
+  local url="https://github.com/chmln/sd/releases/download/v${SD_VERSION}/${base}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/sd.tar.gz"
+  tar -xzf "$tmp/sd.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/${base}/sd" "$BIN_DIR/sd"
+  echo "Installed sd $SD_VERSION to $BIN_DIR/sd"
+}
+
+install_procs() {
+  _already_installed procs "$PROCS_VERSION" && { echo "procs $PROCS_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-linux" ;;
+    aarch64) target="aarch64-linux" ;;
+    *) echo "Unsupported arch for procs: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local base="procs-v${PROCS_VERSION}-${target}"
+  # Upstream publishes no checksum file for release binaries.
+  local url="https://github.com/dalance/procs/releases/download/v${PROCS_VERSION}/${base}.zip"
+
+  curl -fsSL "$url" -o "$tmp/procs.zip"
+  unzip -q "$tmp/procs.zip" -d "$tmp"
+  install -Dm755 "$tmp/procs" "$BIN_DIR/procs"
+  echo "Installed procs $PROCS_VERSION to $BIN_DIR/procs"
 }
