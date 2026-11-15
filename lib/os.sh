@@ -23,7 +23,7 @@ detect_pkg_mgr() {
 pkg_install() {
   case "$PKG_MGR" in
     apt)
-      sudo apt-get update -qq
+      sudo apt-get update -qq || echo "Warning: apt-get update had errors (stale repo?), continuing" >&2
       sudo apt-get install -y "$@"
       ;;
     dnf)
