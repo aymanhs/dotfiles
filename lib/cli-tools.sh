@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install ripgrep, fzf and zoxide as static binaries into BIN_DIR.
+# Install ripgrep, fzf, zoxide and eza as static binaries into BIN_DIR.
 # Idempotent: skips download if the pinned version is already installed.
 
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
@@ -82,4 +82,26 @@ install_zoxide() {
   tar -xzf "$tmp/zoxide.tar.gz" -C "$tmp"
   install -Dm755 "$tmp/zoxide" "$BIN_DIR/zoxide"
   echo "Installed zoxide $ZOXIDE_VERSION to $BIN_DIR/zoxide"
+}
+
+install_eza() {
+  _already_installed eza "$EZA_VERSION" && { echo "eza $EZA_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-unknown-linux-gnu" ;;
+    aarch64) target="aarch64-unknown-linux-gnu" ;;
+    *) echo "Unsupported arch for eza: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local url="https://github.com/eza-community/eza/releases/download/v${EZA_VERSION}/eza_${target}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/eza.tar.gz"
+  tar -xzf "$tmp/eza.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/eza" "$BIN_DIR/eza"
+  echo "Installed eza $EZA_VERSION to $BIN_DIR/eza"
 }

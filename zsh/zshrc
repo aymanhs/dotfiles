@@ -12,6 +12,7 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+[[ -f ~/.aliases.zsh ]] && source ~/.aliases.zsh
 [[ -f ~/.local.sh ]] && source ~/.local.sh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.

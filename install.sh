@@ -30,9 +30,11 @@ install_p10k_theme
 install_ripgrep
 install_fzf
 install_zoxide
+install_eza
 
 link_file "$SCRIPT_DIR/zsh/zshrc" "$HOME/.zshrc"
 link_file "$SCRIPT_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
+link_file "$SCRIPT_DIR/zsh/aliases.zsh" "$HOME/.aliases.zsh"
 
 echo
 echo "Done."
