@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Install ripgrep, fzf, zoxide, eza, bat, fd, dust, bottom, delta, duf,
-# tealdeer (tldr) and direnv as static binaries into BIN_DIR.
+# tealdeer (tldr), direnv and atuin as static binaries into BIN_DIR.
 # Idempotent: skips download if the pinned version is already installed.
 
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
@@ -289,4 +289,30 @@ install_direnv() {
   curl -fsSL "$url" -o "$tmp/direnv"
   install -Dm755 "$tmp/direnv" "$BIN_DIR/direnv"
   echo "Installed direnv $DIRENV_VERSION to $BIN_DIR/direnv"
+}
+
+install_atuin() {
+  _already_installed atuin "$ATUIN_VERSION" && { echo "atuin $ATUIN_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-unknown-linux-musl" ;;
+    aarch64) target="aarch64-unknown-linux-musl" ;;
+    *) echo "Unsupported arch for atuin: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local base="atuin-${target}"
+  local url="https://github.com/atuinsh/atuin/releases/download/v${ATUIN_VERSION}/${base}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/atuin.tar.gz"
+  curl -fsSL "${url}.sha256" -o "$tmp/atuin.tar.gz.sha256"
+  (cd "$tmp" && sed "s/${base}.tar.gz/atuin.tar.gz/" "atuin.tar.gz.sha256" | sha256sum -c -)
+
+  tar -xzf "$tmp/atuin.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/${base}/atuin" "$BIN_DIR/atuin"
+  echo "Installed atuin $ATUIN_VERSION to $BIN_DIR/atuin"
 }

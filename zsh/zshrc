@@ -29,7 +29,6 @@ if [[ -d "$HOME/.local/bin" ]]; then
 fi
 
 eval "$(fzf --zsh)"
-eval "$(zoxide init zsh --cmd cd)"
 eval "$(direnv hook zsh)"
 
 # Optional plugins: enabled only if found (oh-my-zsh custom dir or system package).
@@ -46,3 +45,6 @@ _source_if_found() {
 _source_if_found zsh-autosuggestions zsh-autosuggestions.zsh
 _source_if_found zsh-syntax-highlighting zsh-syntax-highlighting.zsh
 unset -f _source_if_found
+
+eval "$(atuin init zsh)"
+eval "$(zoxide init zsh --cmd cd)"

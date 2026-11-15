@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # dotfiles installer: zsh, oh-my-zsh, powerlevel10k, ripgrep, fzf, zoxide,
-# eza, bat, fd, dust, bottom, delta, duf, tealdeer, direnv.
+# eza, bat, fd, dust, bottom, delta, duf, tealdeer, direnv, atuin.
 # Works on Ubuntu/Debian (apt) and Rocky/RHEL/Fedora (dnf). Safe to re-run.
 
 set -euo pipefail
@@ -25,7 +25,7 @@ mkdir -p "$HOME/.local/bin"
 detect_pkg_mgr
 echo "Detected package manager: $PKG_MGR"
 
-pkg_install zsh git curl tar
+pkg_install zsh git curl tar zsh-autosuggestions zsh-syntax-highlighting
 
 install_oh_my_zsh
 install_p10k_theme
@@ -43,6 +43,7 @@ install_delta
 install_duf
 install_tealdeer
 install_direnv
+install_atuin
 
 link_file "$SCRIPT_DIR/zsh/zshrc" "$HOME/.zshrc"
 link_file "$SCRIPT_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
@@ -51,6 +52,9 @@ link_delta_gitconfig
 
 mkdir -p "$HOME/.config/tealdeer"
 link_file "$SCRIPT_DIR/tealdeer/config.toml" "$HOME/.config/tealdeer/config.toml"
+
+mkdir -p "$HOME/.config/atuin"
+link_file "$SCRIPT_DIR/atuin/config.toml" "$HOME/.config/atuin/config.toml"
 
 echo
 echo "Done."
