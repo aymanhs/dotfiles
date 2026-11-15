@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Install ripgrep, fzf, zoxide and eza as static binaries into BIN_DIR.
+# Install ripgrep, fzf, zoxide, eza, bat, fd, dust, bottom, delta and duf as
+# static binaries into BIN_DIR.
 # Idempotent: skips download if the pinned version is already installed.
 
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
@@ -104,4 +105,140 @@ install_eza() {
   tar -xzf "$tmp/eza.tar.gz" -C "$tmp"
   install -Dm755 "$tmp/eza" "$BIN_DIR/eza"
   echo "Installed eza $EZA_VERSION to $BIN_DIR/eza"
+}
+
+install_bat() {
+  _already_installed bat "$BAT_VERSION" && { echo "bat $BAT_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-unknown-linux-musl" ;;
+    aarch64) target="aarch64-unknown-linux-musl" ;;
+    *) echo "Unsupported arch for bat: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local base="bat-v${BAT_VERSION}-${target}"
+  local url="https://github.com/sharkdp/bat/releases/download/v${BAT_VERSION}/${base}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/bat.tar.gz"
+  tar -xzf "$tmp/bat.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/${base}/bat" "$BIN_DIR/bat"
+  echo "Installed bat $BAT_VERSION to $BIN_DIR/bat"
+}
+
+install_fd() {
+  _already_installed fd "$FD_VERSION" && { echo "fd $FD_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-unknown-linux-musl" ;;
+    aarch64) target="aarch64-unknown-linux-musl" ;;
+    *) echo "Unsupported arch for fd: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local base="fd-v${FD_VERSION}-${target}"
+  local url="https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/${base}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/fd.tar.gz"
+  tar -xzf "$tmp/fd.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/${base}/fd" "$BIN_DIR/fd"
+  echo "Installed fd $FD_VERSION to $BIN_DIR/fd"
+}
+
+install_dust() {
+  _already_installed dust "$DUST_VERSION" && { echo "dust $DUST_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-unknown-linux-musl" ;;
+    aarch64) target="aarch64-unknown-linux-musl" ;;
+    *) echo "Unsupported arch for dust: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local base="dust-v${DUST_VERSION}-${target}"
+  local url="https://github.com/bootandy/dust/releases/download/v${DUST_VERSION}/${base}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/dust.tar.gz"
+  tar -xzf "$tmp/dust.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/${base}/dust" "$BIN_DIR/dust"
+  echo "Installed dust $DUST_VERSION to $BIN_DIR/dust"
+}
+
+install_bottom() {
+  _already_installed btm "$BOTTOM_VERSION" && { echo "bottom $BOTTOM_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-unknown-linux-musl" ;;
+    aarch64) target="aarch64-unknown-linux-musl" ;;
+    *) echo "Unsupported arch for bottom: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local url="https://github.com/ClementTsang/bottom/releases/download/${BOTTOM_VERSION}/bottom_${target}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/bottom.tar.gz"
+  tar -xzf "$tmp/bottom.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/btm" "$BIN_DIR/btm"
+  echo "Installed bottom $BOTTOM_VERSION to $BIN_DIR/btm"
+}
+
+install_delta() {
+  _already_installed delta "$DELTA_VERSION" && { echo "delta $DELTA_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64-unknown-linux-gnu" ;;
+    aarch64) target="aarch64-unknown-linux-gnu" ;;
+    *) echo "Unsupported arch for delta: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local base="delta-${DELTA_VERSION}-${target}"
+  local url="https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${base}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/delta.tar.gz"
+  tar -xzf "$tmp/delta.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/${base}/delta" "$BIN_DIR/delta"
+  echo "Installed delta $DELTA_VERSION to $BIN_DIR/delta"
+}
+
+install_duf() {
+  _already_installed duf "$DUF_VERSION" && { echo "duf $DUF_VERSION already installed"; return; }
+
+  local arch target tmp
+  arch="$(arch_name)"
+  case "$arch" in
+    x86_64)  target="x86_64" ;;
+    aarch64) target="arm64" ;;
+    *) echo "Unsupported arch for duf: $arch" >&2; return 1 ;;
+  esac
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  local url="https://github.com/muesli/duf/releases/download/v${DUF_VERSION}/duf_${DUF_VERSION}_linux_${target}.tar.gz"
+
+  curl -fsSL "$url" -o "$tmp/duf.tar.gz"
+  tar -xzf "$tmp/duf.tar.gz" -C "$tmp"
+  install -Dm755 "$tmp/duf" "$BIN_DIR/duf"
+  echo "Installed duf $DUF_VERSION to $BIN_DIR/duf"
 }

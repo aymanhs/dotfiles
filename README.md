@@ -1,8 +1,21 @@
 # dotfiles
 
-zsh + oh-my-zsh + powerlevel10k + ripgrep/fzf/zoxide/eza, installed the same
-way on Ubuntu/Debian and Rocky/RHEL/Fedora. Idempotent — re-running
-`install.sh` is how you update.
+zsh + oh-my-zsh + powerlevel10k + ripgrep/fzf/zoxide/eza/bat/fd/dust/bottom/
+delta/duf, installed the same way on Ubuntu/Debian and Rocky/RHEL/Fedora.
+Idempotent — re-running `install.sh` is how you update.
+
+## Tools and their aliases
+
+| New tool | Replaces | Alias               | Notes |
+|----------|----------|---------------------|-------|
+| eza      | ls       | `ls`, `ll`, `la`, `lt` | |
+| rg       | grep     | `grep`               | |
+| bat      | cat      | `cat`                | `--paging=never`, so it behaves like `cat` in pipes/scripts |
+| dust     | du       | `du`                 | |
+| bottom   | top/htop | `top`                | |
+| duf      | df       | *(none — run `duf` directly)* | |
+| delta    | —        | *(none — git pager)* | wired into `~/.gitconfig` via `include.path`, see below |
+| fd       | find     | *(none, deliberately)* | flag syntax is **not** compatible with `find` — aliasing it is a trap for old muscle memory, run `fd` directly |
 
 ## Install (new machine)
 
@@ -16,8 +29,8 @@ chsh -s "$(command -v zsh)"   # if not already your shell
 ```
 
 Needs `sudo` for `zsh`/`git`/`curl`/`tar` via apt/dnf. Everything else
-(oh-my-zsh, p10k theme, rg/fzf/zoxide/eza) installs into your user account —
-binaries go to `~/.local/bin`, no root needed.
+(oh-my-zsh, p10k theme, all the static-binary tools) installs into your user
+account — binaries go to `~/.local/bin`, no root needed.
 
 ## Update (existing machine)
 
@@ -25,8 +38,8 @@ binaries go to `~/.local/bin`, no root needed.
 cd ~/dotfiles && git pull && ./install.sh
 ```
 
-Pulls latest p10k theme, re-checks pinned rg/fzf/zoxide/eza versions (skips if
-already current), re-links config. Safe to run anytime.
+Pulls latest p10k theme, re-checks all pinned tool versions (skips if already
+current), re-links config. Safe to run anytime.
 
 ## Syncing config changes
 
@@ -52,8 +65,9 @@ content.
 ## Bumping tool versions
 
 Edit `lib/versions.sh`, then run `./install.sh`. ripgrep and fzf downloads are
-checksum-verified against the upstream release; zoxide and eza are fetched
-straight from GitHub over TLS (no published checksums for those releases).
+checksum-verified against the upstream release; the rest (zoxide, eza, bat,
+fd, dust, bottom, delta, duf) are fetched straight from GitHub over TLS (no
+published checksums for those releases).
 
 ## Layout
 
@@ -61,14 +75,17 @@ straight from GitHub over TLS (no published checksums for those releases).
 install.sh          entrypoint
 lib/
   os.sh              apt/dnf detection via /etc/os-release
-  versions.sh         pinned rg/fzf/zoxide/eza versions
+  versions.sh         pinned tool versions
   cli-tools.sh        static-binary installers (checksum-verified where published)
-  zsh-setup.sh        oh-my-zsh + powerlevel10k theme
+  zsh-setup.sh        oh-my-zsh + powerlevel10k theme + gitstatusd connectivity check
   link.sh             symlink helper (backs up any pre-existing real file once)
+  git-setup.sh        wires git/delta.gitconfig into ~/.gitconfig via include.path
 zsh/
   zshrc               -> ~/.zshrc
   p10k.zsh            -> ~/.p10k.zsh
   aliases.zsh         -> ~/.aliases.zsh
+git/
+  delta.gitconfig      included from ~/.gitconfig, not symlinked directly
 ```
 
 ## Notes

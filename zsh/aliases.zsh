@@ -7,6 +7,9 @@ alias la='eza -la --git'
 alias lt='eza --tree --level=2'
 
 alias grep='rg'
+alias cat='bat --paging=never'
+alias du='dust'
+alias top='btm'
 
 alias path='echo $PATH | tr : "\n"'
 

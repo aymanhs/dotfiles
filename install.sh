@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# dotfiles installer: zsh, oh-my-zsh, powerlevel10k, ripgrep, fzf, zoxide.
+# dotfiles installer: zsh, oh-my-zsh, powerlevel10k, ripgrep, fzf, zoxide,
+# eza, bat, fd, dust, bottom, delta, duf.
 # Works on Ubuntu/Debian (apt) and Rocky/RHEL/Fedora (dnf). Safe to re-run.
 
 set -euo pipefail
@@ -16,6 +17,8 @@ source "$SCRIPT_DIR/lib/cli-tools.sh"
 source "$SCRIPT_DIR/lib/zsh-setup.sh"
 # shellcheck source=lib/link.sh
 source "$SCRIPT_DIR/lib/link.sh"
+# shellcheck source=lib/git-setup.sh
+source "$SCRIPT_DIR/lib/git-setup.sh"
 
 mkdir -p "$HOME/.local/bin"
 
@@ -32,10 +35,17 @@ install_ripgrep
 install_fzf
 install_zoxide
 install_eza
+install_bat
+install_fd
+install_dust
+install_bottom
+install_delta
+install_duf
 
 link_file "$SCRIPT_DIR/zsh/zshrc" "$HOME/.zshrc"
 link_file "$SCRIPT_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
 link_file "$SCRIPT_DIR/zsh/aliases.zsh" "$HOME/.aliases.zsh"
+link_delta_gitconfig
 
 echo
 echo "Done."
