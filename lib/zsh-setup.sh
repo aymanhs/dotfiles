@@ -32,12 +32,19 @@ install_p10k_theme() {
 # downloads redirect to a separate host (release-assets.githubusercontent.com
 # or similar), which is commonly blocked even when github.com itself is
 # reachable. So we probe a real release asset, following redirects, instead.
+#
+# If unreachable, we also clear any cached p10k "instant prompt" dump: that
+# cache replays a captured gitstatus-init call at the very top of .zshrc,
+# before ~/.local.sh is even sourced, so a stale cache from before the
+# disable flags were set will keep retrying the fetch regardless of them.
 check_gitstatus_connectivity() {
   local probe_url="https://github.com/romkatv/gitstatus/releases/download/v1.5.4/gitstatusd-linux-x86_64.tar.gz"
   if curl -fsSL -m 8 -o /dev/null -r 0-0 "$probe_url" 2>/dev/null; then
     echo "gitstatusd release CDN reachable - powerlevel10k git status will work normally."
     return
   fi
+
+  rm -f "${XDG_CACHE_HOME:-$HOME/.cache}"/p10k-instant-prompt-*.zsh
 
   cat >&2 <<'EOF'
 
@@ -47,7 +54,9 @@ download will hang on first login (git status segment in the prompt).
 To disable it on this machine, add to ~/.local.sh:
 
   export POWERLEVEL9K_DISABLE_GITSTATUS=true
+  export GITSTATUS_AUTO_INSTALL=0
 
 (~/.local.sh is sourced from .zshrc and is machine-local, not in this repo.)
+Then start a fresh shell (exec zsh) to pick it up.
 EOF
 }

@@ -49,10 +49,8 @@
   # Left prompt segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
     # =========================[ Line #1 ]=========================
-    user
-    host
     time
-    context                   # user@host
+    context                   # user@host, shown only when root or over SSH
     dir                       # current directory
     vcs                       # git status
     command_execution_time    # previous command duration
