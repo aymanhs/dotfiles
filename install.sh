@@ -56,6 +56,9 @@ link_file "$SCRIPT_DIR/tealdeer/config.toml" "$HOME/.config/tealdeer/config.toml
 mkdir -p "$HOME/.config/atuin"
 link_file "$SCRIPT_DIR/atuin/config.toml" "$HOME/.config/atuin/config.toml"
 
+echo "Importing existing shell history into atuin..."
+"$HOME/.local/bin/atuin" import auto || echo "Warning: atuin history import failed, continuing" >&2
+
 echo
 echo "Done."
 if [[ "$SHELL" != *zsh* ]]; then

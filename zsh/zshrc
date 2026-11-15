@@ -46,5 +46,5 @@ _source_if_found zsh-autosuggestions zsh-autosuggestions.zsh
 _source_if_found zsh-syntax-highlighting zsh-syntax-highlighting.zsh
 unset -f _source_if_found
 
-eval "$(atuin init zsh)"
+eval "$(atuin init zsh --disable-up-arrow)"
 eval "$(zoxide init zsh --cmd cd)"
