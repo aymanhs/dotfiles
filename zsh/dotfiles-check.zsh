@@ -6,6 +6,11 @@
 # checked. The network fetch is separately throttled by a cache-file
 # timestamp, shared across all shells, so concurrent sessions don't all fetch
 # at once.
+#
+# The first run is deferred to the first precmd (rather than called directly
+# here, at source time) so any output lands after the prompt is up -- p10k's
+# instant prompt (set to `verbose`) warns about console output that happens
+# during zsh initialization.
 
 zmodload zsh/sched 2>/dev/null
 
@@ -53,4 +58,11 @@ _dotfiles_check() {
   echo "+${border}+"
 }
 
-_dotfiles_check
+autoload -Uz add-zsh-hook
+
+_dotfiles_check_first_precmd() {
+  add-zsh-hook -d precmd _dotfiles_check_first_precmd
+  _dotfiles_check
+}
+
+add-zsh-hook precmd _dotfiles_check_first_precmd
