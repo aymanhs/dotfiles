@@ -66,6 +66,28 @@ cd ~/dotfiles && git pull
 No re-link needed either way — the symlink always points at the current repo
 content.
 
+## Drift check
+
+Every shell checks this repo for drift — commits behind/ahead of `origin`, or
+uncommitted local edits — and prints a small box if there's anything to
+report:
+
+```
++-------------------+
+| dotfiles:         |
+|   2 behind origin |
+|   1 uncommitted   |
++-------------------+
+```
+
+Runs once per shell, then re-arms itself every `DOTFILES_CHECK_INTERVAL`
+(default 1h, in seconds) via zsh's builtin `sched` — no cron, no systemd, no
+extra module to install (`zsh/sched` ships with zsh itself). The network
+`fetch` is throttled by a shared timestamp in
+`~/.cache/dotfiles-check-last`, so multiple open shells don't all fetch at
+once; the local ahead/behind/dirty comparison is free and runs every time.
+See `zsh/dotfiles-check.zsh`.
+
 ## Bumping tool versions
 
 Edit `lib/versions.sh`, then run `./install.sh`. ripgrep, fzf, jq and yq
@@ -88,6 +110,7 @@ zsh/
   zshrc               -> ~/.zshrc
   p10k.zsh            -> ~/.p10k.zsh
   aliases.zsh         -> ~/.aliases.zsh
+  dotfiles-check.zsh   periodic drift check, sourced from zshrc
 git/
   delta.gitconfig      included from ~/.gitconfig, not symlinked directly
 vim/
