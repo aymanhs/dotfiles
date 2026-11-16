@@ -52,6 +52,11 @@ _source_if_found zsh-autosuggestions zsh-autosuggestions.zsh
 _source_if_found zsh-syntax-highlighting zsh-syntax-highlighting.zsh
 unset -f _source_if_found
 
+# Pasting is otherwise slow: zsh re-highlights/re-suggests on every character.
+# This tells zsh's bracketed-paste-magic to fast-path plain self-insert during
+# a paste instead of running the full zle widget machinery per character.
+zstyle ':bracketed-paste-magic' active-widgets '.self-*'
+
 eval "$(atuin init zsh --disable-up-arrow)"
 eval "$(zoxide init zsh --cmd cd)"
 
