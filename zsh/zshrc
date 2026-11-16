@@ -17,6 +17,10 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+# Terminal tab/window title: HOST:folder (oh-my-zsh sets these unconditionally, so override after sourcing)
+ZSH_THEME_TERM_TAB_TITLE_IDLE="%m:%15<..<%~%<<"
+ZSH_THEME_TERM_TITLE_IDLE="%m:%~"
+
 zstyle ':completion:*' menu select
 
 [[ -f ~/.aliases.zsh ]] && source ~/.aliases.zsh
