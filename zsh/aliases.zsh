@@ -7,7 +7,7 @@ alias la='eza -la --git'
 alias lt='eza --tree --level=2'
 
 alias grep='grep --color=auto  $GREP_OPTIONS'
-alias cat='bat --paging=never'
+alias cat='bat -p'
 alias du='dust'
 alias top='btm'
 
