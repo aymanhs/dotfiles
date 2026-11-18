@@ -61,4 +61,5 @@ eval "$(atuin init zsh --disable-up-arrow)"
 
 # Flags upstream/local dotfiles changes, re-checking periodically; see the script.
 [[ -f "$HOME/dotfiles/zsh/dotfiles-check.zsh" ]] && source "$HOME/dotfiles/zsh/dotfiles-check.zsh"
+export _ZO_DOCTOR=0
 eval "$(zoxide init zsh --cmd cd)"
