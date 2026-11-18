@@ -58,7 +58,7 @@ unset -f _source_if_found
 zstyle ':bracketed-paste-magic' active-widgets '.self-*'
 
 eval "$(atuin init zsh --disable-up-arrow)"
-eval "$(zoxide init zsh --cmd cd)"
 
 # Flags upstream/local dotfiles changes, re-checking periodically; see the script.
 [[ -f "$HOME/dotfiles/zsh/dotfiles-check.zsh" ]] && source "$HOME/dotfiles/zsh/dotfiles-check.zsh"
+eval "$(zoxide init zsh --cmd cd)"
